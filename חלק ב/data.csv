@@ -1,0 +1,6 @@
+﻿Spouse_Id,Mother_Id,Father_Id,Gender,Family_name,Name,Person_Id
+2,6,5,male,levi,yossy,1
+1,7,8,female,cohen,dana,2
+,2,1,male,cohen,daniel,3
+,2,1,female,cohen,noa,4
+4,2,1,male,cohen,nuli,9
