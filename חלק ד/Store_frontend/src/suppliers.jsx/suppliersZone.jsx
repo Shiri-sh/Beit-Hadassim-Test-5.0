@@ -9,7 +9,7 @@ const DisplayOrders = () => {
     function logout() {
         setUser((prevUser) => ({
             ...prevUser,
-            id: '', // מעדכנת רק את bus ומשאירה את שאר הנתונים
+            id: '', 
         }));
     navigate("/login", { replace: true });
     }

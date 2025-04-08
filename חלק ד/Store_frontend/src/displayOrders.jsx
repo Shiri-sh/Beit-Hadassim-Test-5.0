@@ -2,16 +2,14 @@ import { useEffect, useState } from "react";
 import apiCall from "./ApiCalls";
 import { useContext } from "react";
 import { ContextUser } from "./contextUser";
-import { Link, Outlet, useParams } from 'react-router-dom'
-import { use } from "react";
 
 const DisplayOrders = () => {
     const [orders, setOrders] = useState([]);
-    const {user,setUser}=useContext(ContextUser)
+    const {user}=useContext(ContextUser)
     const changeStatus=async(id)=>{
         let newStatus = user.bus==="supplier" ? "Process" : "Approve" ;
         const data = await apiCall(`Order/${id}`, "PUT", newStatus);
-        if (data) {
+        if (data != null) {
             setOrders((prevOrders) =>
                 prevOrders.map((order) =>
                     order.id ===id ? { ...order, oStatus: newStatus } : order
@@ -27,7 +25,6 @@ const DisplayOrders = () => {
     useEffect(() => {
         async function getOrders() {
             let data;
-            console.log(user)
             if(user.id!==''){
                  data= await apiCall(`Order/${user.id}`) 
             }
@@ -36,16 +33,11 @@ const DisplayOrders = () => {
             }
             if (data){
                 setOrders(data);
-                console.log("display:"+ orders);
             }
         }
         
         getOrders();
-    }, [user]);
-    
-    console.log("orders:", orders)
-    console.log("user:", user)
-
+    }, []);
 
     return (
         <>

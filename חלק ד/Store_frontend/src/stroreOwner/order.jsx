@@ -2,55 +2,69 @@ import { useContext, useEffect, useState } from 'react'
 import apiCall from '../ApiCalls'
 //import { ContextUser } from '../contextUser'
 const Order = () => {
-    const [name, setName] = useState("")
+    const [prodId, setProdId] = useState(1)
     const [sum, setSum] = useState(0)
     const [supplier, setSupplier] = useState(0)
     const [suppliers, setSuppliers] = useState([])
+    const [products, setProducts] = useState([])
+
    // const {user,setUser}=useContext(ContextUser)
-    const validateSum = async(sum) => {
-        const data=await apiCall(`Good/${encodeURIComponent(name)}/${Number(supplier)}`)
-        if(data){
-            console.log(data);
-            const minAmount=data[0].MinimumQuantityForOrder;
+    const validateSum = async() => {
+        const data=await apiCall(`Good/${Number(prodId)}/${Number(supplier)}`)
+        if(data != null){
+            const minAmount=data[0].minimumQuantityForOrder;
             if(sum<minAmount){
-                alert(`The minimum amount of ${name} is ${minAmount}`)
+                alert(`The minimum amount is ${minAmount}`)
                 return false
             }
         }
+        else{
+            return false
+        }
         return true     
     }
-    const HandleForm = async () => {
-        //if(!(await validateSum(sum))){ return;};
+    const HandleForm = async (e) => {
+        e.preventDefault();
+        if(!(await validateSum())){ return;};
         const updatedOrder = {
-            oStatus: 'Open', 
-            productName: name,
+            productID: prodId,
             sumP: sum,
+            oStatus: 'Open', 
             supplierID: supplier,
         };
         const response = await apiCall("Order",'POST',updatedOrder);
-        if (response) {
+        if (response.status === 200) {
             alert('Order add successfully');
         }
     };
     useEffect(() => {
-        async function getSuppliers() {
-            const data= await apiCall(`Supplier`)
-            if(data){
-                setSuppliers(data)
+        async function getSuppPod() {
+            const sups= await apiCall(`Supplier`)
+            if(sups){
+                setSuppliers(sups)
+            }
+            const prods= await apiCall(`Product`)
+            if(prods){
+                setProducts(prods)
             }
         }
-        getSuppliers()
+        getSuppPod()
     },[])
     return (
         <div>
             <h1>Order</h1>
                 <form onSubmit={HandleForm} style={{backgroundColor:"pink",padding:"30px",borderRadius:"20px"}}>
-                <input
-                type="text" 
-                value={name}
-                placeholder='product:'
-                onChange={(e) => setName(e.target.value)}
-                />
+                <label>products:</label>
+                <select
+                value={prodId}
+                onChange={(e) => setProdId(Number(e.target.value))}
+                >
+                {products.map((p) => (
+                    <option key={p.id} value={p.id}>
+                    {p.productName}
+                    </option>
+                ))}
+                </select>
                 <br/>
                 <input
                 type="number" 

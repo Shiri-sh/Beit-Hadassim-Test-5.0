@@ -6,8 +6,6 @@ export const ContextUser = createContext();
 const ContextUserProvider = ({children}) => {
 
     const [user, setUser] = useState({id: "", bus: "supplier"});
-    // const resetUser = () => {localStorage.setItem("currentUser", ""); setUser({})};
-
 
     return (
         <ContextUser.Provider value={{user, setUser}}>

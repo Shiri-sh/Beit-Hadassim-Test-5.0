@@ -14,7 +14,7 @@ def validate_check_on_data(dfn):
     if not required_columns.issubset(df.columns):
         print("Error: One or more required columns are missing!")
         exit()
-
+    #check the validation of the date
     df["timestamp"] = pd.to_datetime(df["timestamp"], errors="coerce")
 
     invalid_dates = df["timestamp"].isna().sum()
@@ -22,7 +22,8 @@ def validate_check_on_data(dfn):
         print(f"Warning: {invalid_dates} rows have an invalid timestamp and will be removed.")
         df = df.dropna(subset=["timestamp"])
 
-    df = df[df["value"] != "not_a_number"]
+    #check the validation of the value
+    df["value"] = pd.to_numeric(df["value"], errors="coerce")
     missing_values = df["value"].isna().sum()
     if missing_values > 0:
         print(f"Warning: {missing_values} rows have missing values and will be removed.")

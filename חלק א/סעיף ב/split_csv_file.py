@@ -8,7 +8,7 @@ def split_file(df, original_ext):
     df["timestamp"] = pd.to_datetime(df["timestamp"], dayfirst=True)
     df["date"] = df["timestamp"].dt.date
     hourly_files = []
-
+    #foreach day creat a file
     for day, group in df.groupby("date"):
         day_filename = f"day_{day}{original_ext}"
 

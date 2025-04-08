@@ -11,10 +11,10 @@ const OwnerZone = () => {
     const { user, setUser} = useContext(ContextUser);
    
     function logout() {
-        setUser((prevUser) => ({
+        setUser({
             id: '',
-            bus: 'supplier', // מעדכנת רק את bus ומשאירה את שאר הנתונים
-        }));
+            bus: 'supplier', 
+        });
         navigate("/login", { replace: true });
     }
     return (
@@ -23,6 +23,8 @@ const OwnerZone = () => {
             <h1>My Zone</h1>
             <button  onClick={() => navigate(`order`)}>order a delivery</button>
             <button  onClick={() => navigate(`displayOrders`)}>show my orders</button>
+            <button  onClick={() => navigate(`cashDesk`)}>cash Desk</button>
+
             <button onClick={logout}>log out</button>
         </div>
         <Outlet />

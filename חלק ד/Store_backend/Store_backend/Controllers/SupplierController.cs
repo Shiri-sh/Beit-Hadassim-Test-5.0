@@ -10,24 +10,27 @@ namespace Store_backend.Controllers;
 [ApiController]
 public class SupplierController : ControllerBase
 {
-    private readonly StoreDbContext _context; // משתנה שמחזיק את החיבור למסד הנתונים
+    private readonly StoreDbContext _context; 
 
-    public SupplierController(StoreDbContext context) // הזרקת ה-DbContext דרך ה-Constructor
+    public SupplierController(StoreDbContext context) 
     {
         _context = context;
     }
 
     // GET api/<SupplierController>/5
     [HttpGet("{pass}")]
+    //return supplier by password
     async public Task<ActionResult<Supplier>> Get(string pass)
     {
         var sup = await _context.Supplier.Include(s => s.Goods).FirstOrDefaultAsync(s => s.NumberPhone == pass);
-        if (sup == null) { return NotFound("supplier doesnt exist"); }
+        if (sup == null) { return NotFound("wrong password "); }
         return Ok(sup);
     }
     [HttpGet]
+    //return all suppliers
     async public Task<ActionResult<Supplier>> Get()
     {
+       
         var sups = await _context.Supplier.ToListAsync();
         if (sups == null|| sups.Count() == 0) { return NotFound("No suppliers"); }
         return Ok(sups);
@@ -51,10 +54,11 @@ public class SupplierController : ControllerBase
             Goods = new List<Good>()
 
         };
+        //add the goods
         foreach (var item in s.Goods) {
             var good = new Good
             {
-                ProductName=item.ProductName,
+                ProductID = item.ProductID,
                 PricePerItem = item.PricePerItem,
                 MinimumQuantityForOrder = item.MinimumQuantityForOrder,
                 SupplierID = s.ID,
@@ -65,6 +69,4 @@ public class SupplierController : ControllerBase
         await _context.SaveChangesAsync();
         return CreatedAtAction(nameof(Post), new { id = supplier.ID }, supplier);
     }
-
-
 }

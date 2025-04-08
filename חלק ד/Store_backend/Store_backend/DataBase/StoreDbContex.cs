@@ -9,6 +9,9 @@ public class StoreDbContext : DbContext
     public DbSet<Supplier> Supplier { get; set; }
     public DbSet<OrderType> OrderType { get; set; }
     public DbSet<Good> Good { get; set; }
+    public DbSet<StoreOwnerInventory> StoreOwnerInventory { get; set; }
+    public DbSet<Product> Product { get; set; }
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         if (!optionsBuilder.IsConfigured)

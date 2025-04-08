@@ -1,18 +1,20 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ContextUser } from "./contextUser";
 import apiCall from "./ApiCalls";
+
 const SignUp = () => {
+   
+    const [products,setProducts]=useState([]);
+    const { setUser } = useContext(ContextUser);
+    const navigate = useNavigate();
     const [formData, setFormData] = useState({
         Id: "",
         CompanyName: "",
         NumberPhone: "",
         AgentName: "",
-        Goods: [{ ProductName: "", MinimumQuantityForOrder: 0, PricePerItem: 0 }]
+        Goods: [{ ProductID: 0, MinimumQuantityForOrder: 0, PricePerItem: 0}],
     });
-    const { setUser, user } = useContext(ContextUser);
-    const navigate = useNavigate();
-
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData((prev) => ({ ...prev, [name]: value }));
@@ -21,7 +23,7 @@ const SignUp = () => {
     const addNewGood = () => {
         setFormData((prev) => ({
             ...prev,
-            Goods: [...prev.Goods, { ProductName: "", MinimumQuantityForOrder: "", PricePerItem: "" }]
+            Goods: [...prev.Goods, { ProductID: 0, MinimumQuantityForOrder: 0, PricePerItem: 0  }]
         }));
     };
     const removeGood = (indexToRemove) => {
@@ -34,7 +36,7 @@ const SignUp = () => {
         if (value < 0) return;
         const updatedGoods = [...formData.Goods];
         updatedGoods[index] = { ...updatedGoods[index],
-            [field]: ["MinimumQuantityForOrder", "PricePerItem"].includes(field)
+            [field]: ["ProductID", "MinimumQuantityForOrder", "PricePerItem"].includes(field)
             ? Number(value)
             : value
         };  
@@ -56,10 +58,6 @@ const SignUp = () => {
         if (formData.NumberPhone.length !== 10 || !/^\d+$/.test(formData.NumberPhone)) {
             errors.push("The phone number should be exactly 10 digits.");
         }
-        if (formData.Goods.some(good => good.ProductName === "")) {
-            errors.push("must fill the product name.");
-        }
-        console.log(errors);
         return errors;
     }
     
@@ -71,15 +69,34 @@ const SignUp = () => {
             alert(errors.join("\n"));
             return;
         }
+        const supplierId = Number(formData.Id); 
+
+        const goodsWithSupplierId = formData.Goods.map((g) => ({
+            ...g,
+            SupplierID: supplierId
+        }));
+    
+        const finalFormData = {
+            ...formData,
+            Id: supplierId,
+            Goods: goodsWithSupplierId
+        };
         setUser({ id: formData.Id, bus: "supplier" });
-        console.log(formData);
-        let data= await apiCall("Supplier", "POST", { ...formData ,Goods: formData.Goods });
+        let data= await apiCall("Supplier", "POST", finalFormData);
         if (data) {
-            console.log(`${user.bus} added successfully`);
             navigate(`/suppliers/${formData.Id}/displayOrders`);
         }
     };
-   
+    useEffect(() => {
+        async function getSuppPod() {
+            const prods= await apiCall(`Product`)
+            if(prods){
+                setProducts(prods)
+            }
+        }
+        getSuppPod()
+    },[])
+
     return (
         <div>
             <h1>Sign Up</h1>
@@ -94,12 +111,15 @@ const SignUp = () => {
                 {formData.Goods.map((good, index) => (
                
                     <div key={index}>
-                    {/* <div>{good.ProductName}</div> */}
-                    <InputField
-                        value={good.ProductName}
-                        placeholder="Product name"
-                        onChange={(e) => handleGoodChange(index, "ProductName", e.target.value)}
-                    />
+                    <select
+                    value={good.ProductID}
+                    onChange={(e) => handleGoodChange(index, "ProductID", e.target.value)}
+                    >
+                    {products.map((product) => (
+                        <option key={product.id} value={product.id}>{product.productName}</option>
+                    ))}
+                    </select>
+                    <br/>
                     <InputField
                         value={good.MinimumQuantityForOrder}
                         placeholder="Minimum quantity"

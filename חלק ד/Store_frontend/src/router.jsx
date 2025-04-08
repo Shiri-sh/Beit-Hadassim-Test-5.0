@@ -6,7 +6,7 @@ import SuppliersZone from "./suppliers.jsx/suppliersZone";
 import Order from "./stroreOwner/order";
 import DisplayOrders from "./displayOrders";
 import ContextUserProvider from "./contextUser";
-//import SUSignUp from "./stroreOwner/signUp";
+import Buyer from "./stroreOwner/cashDesk";
 import App from "./App";
 
 const router = createBrowserRouter([
@@ -26,7 +26,8 @@ const router = createBrowserRouter([
             },
             {path:'storeOwner', element:<OwnerZone/>,children:[
                 {path:'order',element:<Order/>},
-                {path:'displayOrders',element:<DisplayOrders/>}
+                {path:'displayOrders',element:<DisplayOrders/>},
+                {path: 'cashDesk', element: <Buyer />}
             ]},
             {path:'*', element:<Navigate to="/login"/>}
         ]

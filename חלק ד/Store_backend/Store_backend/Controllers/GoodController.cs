@@ -10,27 +10,28 @@ namespace Store_backend.Controllers;
 [ApiController]
 public class GoodController : ControllerBase
 {
-    private readonly StoreDbContext _context; // משתנה שמחזיק את החיבור למסד הנתונים
-
-    public GoodController(StoreDbContext context) // הזרקת ה-DbContext דרך ה-Constructor
+    private readonly StoreDbContext _context; 
+    public GoodController(StoreDbContext context) 
     {
         _context = context;
     }
     // GET: api/<GoodController>
     [HttpGet("{name}")]
+    //return if exist such good with this name
     async public Task<ActionResult<IEnumerable<Good>>> Get(string name)
     {
-        var goods = await _context.Good.Where(g=>g.ProductName==name).ToListAsync();
-        if (goods == null || goods.Count == 0) { return NotFound("you dont have goods"); }
+        var goods = await _context.Good.Where(g=>g.Product.ProductName==name).ToListAsync();
+        if (goods == null || goods.Count == 0) { return NotFound("no such good"); }
         return Ok(goods);
     }
 
     // GET api/<GoodController>/5
     [HttpGet("{prod}/{sup}")]
-    async public Task<ActionResult<Good>> Get(string prod, int sup)
+    //return if the combination of product and supplier exist
+    async public Task<ActionResult<Good>> Get(int prod, int sup)
     {
-        var good = await _context.Good.Where(g=>g.ProductName== prod && g.SupplierID== sup).ToListAsync();
-        if (good == null || good.Count == 0) { return NotFound("this supplier doesnt provide that good or there is no such good"); }
+        var good = await _context.Good.Where(g=>g.ProductID== prod && g.SupplierID== sup).ToListAsync();
+        if (good == null || good.Count == 0) { return NotFound("this supplier doesnt provide that good "); }
         return Ok(good);
     }
 

@@ -12,35 +12,22 @@ async function apiCall(navigateString, methodType = "GET", dataContent = null) {
 
   try {
     const url = `https://localhost:7152/api/${navigateString}`;
-    console.log("Fetching from:", url,"!!!!!!!!!!!!!!!!!!!!!!!!");
     const response = await fetch(url, options);
-    console.log("Status:", response.status);
 
-    const contentType = response.headers.get("content-type") || "";
+    const textResponse = await response.text();
 
-    // אם הייתה שגיאה מהשרת – נטפל בזה
     if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`HTTP ${response.status}: ${errorText}`);
+      throw new Error(`${response.status}: ${textResponse}`);
     }
-
-    // אם התגובה ריקה או לא JSON – נחזיר טקסט
-    if (!contentType.includes("application/json")) {
-      const text = await response.text();
-      return text;
+    try {
+      const data = JSON.parse(textResponse);
+      return data;
+    } catch (jsonError) {
+      return textResponse;
     }
-
-    // אחרת – נקרא כ-JSON
-    const data = await response.json();
-    console.log("Parsed data:", data);
-    return data;
 
   } catch (error) {
-    console.error("Full error:", error);
-    console.error("Error name:", error.name);
-    console.error("Error message:", error.message);
-    console.error("Error stack:", error.stack);
-    alert("fetching error: " + error.message);
+    alert("Fetching error: " + error.message);
     return null;
   }
 }
