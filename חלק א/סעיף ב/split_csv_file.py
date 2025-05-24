@@ -6,11 +6,18 @@ from validate_check import validate_check_on_data
 
 def split_file(df, original_ext):
     df["timestamp"] = pd.to_datetime(df["timestamp"], dayfirst=True)
+
+    invalid_rows = df["timestamp"].isna().sum()
+    if invalid_rows > 0:
+        print(f"Warning: {invalid_rows} rows with invalid timestamp will be dropped.")
+        df = df.dropna(subset=["timestamp"])
+
     df["date"] = df["timestamp"].dt.date
     hourly_files = []
     #foreach day creat a file
     for day, group in df.groupby("date"):
         day_filename = f"day_{day}{original_ext}"
+        group = group.drop(columns=["date"])
 
         if original_ext == ".csv":
             group.to_csv(day_filename, index=False)

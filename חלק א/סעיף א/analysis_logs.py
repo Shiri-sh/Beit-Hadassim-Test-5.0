@@ -34,6 +34,50 @@ print(f"{N} most common errors in the file")
 for error, count in most_common_errors:
     print(f"{error}: was shown {count} times")
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # קריאה של הקובץ לפיצול → O(N)
 # כתיבת החלקים → O(N)
 # קריאת כל קובץ וספירת שגיאות → O(N)

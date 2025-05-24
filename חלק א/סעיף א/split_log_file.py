@@ -1,7 +1,7 @@
 
 #the function slplits "logs" to small files
 
-def split_log_file(input_file, lines_per_file=1000):
+def split_log_file(input_file, lines_per_file):
 
     with open(input_file, "r") as file:
         lines = file.readlines()
