@@ -1,20 +1,11 @@
 import pandas as pd
 import os
 
-def validate_check_on_data(dfn):
-    ext = os.path.splitext(dfn)[1].lower()
-    if ext == ".csv":
-        df = pd.read_csv(dfn)
-    elif ext == ".parquet":
-        df = pd.read_parquet(dfn)
-    else:
-        raise ValueError("Unsupported file type")
+def validate_check_on_data(dfn:str,df:pd.DataFrame,ext:str):
 
     required_columns = {"timestamp", "value"}
     if not required_columns.issubset(df.columns):
-        print("Error: One or more required columns are missing!")
-        exit()
-
+        raise ValueError("One or more required columns are missing!")
     #check the validation of the value
     df["value"] = pd.to_numeric(df["value"], errors="coerce")
     missing_values = df["value"].isna().sum()

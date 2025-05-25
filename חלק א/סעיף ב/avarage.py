@@ -1,15 +1,7 @@
 import pandas as pd
 import os
 
-def calculate_hour_avarage(file_name):
-    ext = os.path.splitext(file_name)[1].lower()
-
-    if ext == ".csv":
-        df = pd.read_csv(file_name)
-    elif ext == ".parquet":
-        df = pd.read_parquet(file_name)
-    else:
-        raise ValueError("Unsupported file type")
+def calculate_hour_avarage(file_name:str,df:pd.DataFrame,ext:str):
 
     # Convert timestamp to datetime
     df["timestamp"] = pd.to_datetime(df["timestamp"])

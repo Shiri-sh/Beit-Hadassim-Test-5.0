@@ -32,11 +32,9 @@ except Exception as e:
     print(f"Error loading the file: {e}")
     exit()
 
-splited_files = split_file(df, ext)
+daily_data = split_file(df, ext)
 
-final_df = pd.concat(
-    [pd.read_csv(f) if ext == ".csv" else pd.read_parquet(f) for f in splited_files]
-)
+final_df =pd.concat([df for (_, _, df) in daily_data], ignore_index=True)
 
 # Save final file
 if ext == ".csv":
