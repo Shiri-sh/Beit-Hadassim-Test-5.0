@@ -1,24 +1,42 @@
 import pandas as pd
-import os
 
-def validate_check_on_data(dfn:str,df:pd.DataFrame,ext:str):
+def validate_check_on_data(
+    file_name: str,
+    df: pd.DataFrame,
+    ext: str
+) -> None:
+    """
+    Validate required columns, remove invalid values and duplicates.
+    """
 
     required_columns = {"timestamp", "value"}
     if not required_columns.issubset(df.columns):
-        raise ValueError("One or more required columns are missing!")
-    #check the validation of the value
-    df["value"] = pd.to_numeric(df["value"], errors="coerce")
-    missing_values = df["value"].isna().sum()
-    if missing_values > 0:
-        print(f"Warning: {missing_values} rows have missing values and will be removed.")
-        df = df.dropna(subset=["value"])
+        raise ValueError("Missing required columns")
 
+    df["value"] = pd.to_numeric(df["value"], errors="coerce")
+
+    missing = df["value"].isna().sum()
+    if missing:
+        print(f"Warning: {missing} invalid values removed.")
+        df.dropna(subset=["value"], inplace=True)
+
+    MIN_VALUE = 0
+    MAX_VALUE = 100
+
+    out_of_range = ~df["value"].between(MIN_VALUE, MAX_VALUE)
+    if out_of_range.sum() > 0:
+        print(
+            f"Warning: {out_of_range.sum()} values out of range "
+            f"({MIN_VALUE}–{MAX_VALUE}) removed."
+        )
+        df = df.loc[~out_of_range]
+    
     duplicates = df.duplicated().sum()
-    if duplicates > 0:
-        print(f"Warning: {duplicates} duplicate rows found and will be removed.")
-        df = df.drop_duplicates()
+    if duplicates:
+        print(f"Warning: {duplicates} duplicate rows removed.")
+        df.drop_duplicates(inplace=True)
 
     if ext == ".csv":
-        df.to_csv(dfn, index=False)
-    elif ext == ".parquet":
-        df.to_parquet(dfn, index=False)
+        df.to_csv(file_name, index=False)
+    else:
+        df.to_parquet(file_name, index=False)
