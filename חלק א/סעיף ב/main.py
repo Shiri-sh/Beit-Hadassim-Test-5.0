@@ -1,45 +1,45 @@
-import pandas as pd
 import os
-from validate_check import validate_check_on_data
+import pandas as pd
 from split_csv_file import split_file
-from avarage import calculate_hour_avarage
-#3
-#יצירת מבנה נתונים-מילון לדוג'- שבו כל שעה תכיל את הערכים שהתקבלו לאותה שעה
-#כל פעם שמתקבל נתון חדש בודקים לאיזו שעה הוא שייך ומוסיפים אותו למבנה הנתונים של השעה הזאת
-#את השמירה של הממוצע אפשר לשמור בדאטה בייס כמו POSTGRESQL אם יש צורך בשמירה ממושכת
-#ואם רוצים לראות בזמן אמת אפשר להציג לDASHBOARD באמצעות API
-#אחרי כל שעה ננקה את הזיכרון
 
-#4
-#השינויים הנדרשים בקוד על מנת שיתמוך בקבצים מסוג הזה הם: לשנות את מילות הקוד של קריאה וכתיבה מקובץ
-#היתרונות שיש לקבצים האלה הם:                                            קריאה מהירה יותר
-#יכולת לעבוד עם מבני נתונים יותר מורכבים(מערכים.מבנים מקוננים)
-#החישובים והעיבודים יעילים יותר כי הפורמט תומך בקידוד דחיסות יעיל יותר
-#הקבצים קטנים יחסית בגלל הדחיסה האוטומטית ויעילות אחסון הקולומנים. זה מקטין את כמות המידע שצריך להעביר או לאחסן
+def load_file(file_path: str) -> pd.DataFrame:
+    ext = os.path.splitext(file_path)[1].lower()
 
-
-file_path = "time_series.csv"  # או "time_series.parquet"
-ext = os.path.splitext(file_path)[1].lower()
-
-try:
     if ext == ".csv":
-        df = pd.read_csv(file_path)
+        return pd.read_csv(file_path), ext
     elif ext == ".parquet":
-        df = pd.read_parquet(file_path)
+        return pd.read_parquet(file_path), ext
     else:
         raise ValueError("Unsupported file type")
-except Exception as e:
-    print(f"Error loading the file: {e}")
-    exit()
 
-daily_data = split_file(df, ext)
+def main() -> None:
+    file_path = "time_series.csv"
 
-final_df =pd.concat([df for (_, _, df) in daily_data], ignore_index=True)
+    try:
+        df, ext = load_file(file_path)
+    except Exception as e:
+        print(f"Error loading the file: {e}")
+        return
 
-# Save final file
-if ext == ".csv":
-    final_df.to_csv("final_hourly_avg.csv", index=False)
-elif ext == ".parquet":
-    final_df.to_parquet("final_hourly_avg.parquet", index=False)
+    daily_data = split_file(df, ext)
 
-print("The data was united in the final_hourly_avg file")
+    final_df = pd.concat(
+        [day_df for (_, _, day_df) in daily_data],
+        ignore_index=True
+    )
+
+    output_file = (
+        "final_hourly_avg.csv"
+        if ext == ".csv"
+        else "final_hourly_avg.parquet"
+    )
+
+    if ext == ".csv":
+        final_df.to_csv(output_file, index=False)
+    else:
+        final_df.to_parquet(output_file, index=False)
+
+    print("The data was united in the final_hourly_avg file")
+
+if __name__ == "__main__":
+    main()
