@@ -81,5 +81,3 @@ A full-stack solution for inventory and order management.
 | **Tools** | Git, Argparse |
 
 ---
-
-Developed by [Your Name] 🚀
